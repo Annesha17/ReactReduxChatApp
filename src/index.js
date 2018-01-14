@@ -10,7 +10,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 // Readers: To prepare this project for building along in `./App.js`:
 // [1] Comment out this line:
-import App from './App';
+import App from './App1';
 // [2] Un-comment this line:
 // import App from "./App";
 
