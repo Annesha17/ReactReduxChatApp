@@ -1,28 +1,34 @@
 import React from 'react';
-import { createStore } from 'redux';
+import uuid from 'uuid';
+import {createStore} from 'redux';
 
-function reducer(state, action) {
-  if (action.type === 'ADD_MESSAGE') {
-    return {
-      messages: state.messages.concat(action.message),
+function reducer(state,action){
+    //including message id for every message added
+    const newMessage={
+        text:action.text,
+        timestamp:Date.now(),
+        id:uuid.v4()
     };
-  } else if (action.type === 'DELETE_MESSAGE') {
+    if(action.type==='ADD_MESSAGE'){
+        return{
+            messages:state.messages.concat(newMessage)
+        }
+    }
+    //deleting messages based on message id passed as action.id
+     else if (action.type === 'DELETE_MESSAGE') {
     return {
-      messages: [
-        ...state.messages.slice(0, action.index),
-        ...state.messages.slice(
-          action.index + 1, state.messages.length
-        ),
-      ],
+      messages:state.messages.filter((message)=>(
+          message.id!==action.id
+      ))
     };
   } else {
     return state;
   }
 }
 
-const initialState = { messages: [] };
+const initialState={messages:[]}
 
-const store = createStore(reducer, initialState);
+const store=createStore(reducer,initialState)
 
 class App extends React.Component {
   componentDidMount() {
@@ -55,7 +61,7 @@ class MessageInput extends React.Component {
   handleSubmit = () => {
     store.dispatch({
       type: 'ADD_MESSAGE',
-      message: this.state.value,
+      text: this.state.value,
     });
     this.setState({
       value: '',
@@ -83,10 +89,10 @@ class MessageInput extends React.Component {
 }
 
 class MessageView extends React.Component {
-  handleClick = (index) => {
+  handleClick = (id) => {
     store.dispatch({
       type: 'DELETE_MESSAGE',
-      index: index,
+      id:id
     });
   };
 
@@ -95,9 +101,12 @@ class MessageView extends React.Component {
       <div
         className='comment'
         key={index}
-        onClick={() => this.handleClick(index)}
+        onClick={() => this.handleClick(message.id)}
       >
-        {message}
+        <div className='text'> {/* Wrap message data in `div` */}
+          {message.text}
+          <span className='metadata'>@{message.timestamp}</span>
+        </div>
       </div>
     ));
     return (
